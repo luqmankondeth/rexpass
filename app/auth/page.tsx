@@ -94,8 +94,8 @@ export default function AuthPage() {
                   id="otp"
                   type="text"
                   inputMode="numeric"
-                  placeholder="123456"
-                  maxLength={6}
+                  placeholder="12345678"
+                  maxLength={8}
                   value={otp}
                   onChange={(e) => setOtp(e.target.value.replace(/\D/g, ""))}
                   required
