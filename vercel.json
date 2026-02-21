@@ -1,0 +1,13 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "crons": [
+    {
+      "path": "/api/v1/admin/cron/settlements-weekly",
+      "schedule": "0 4 * * 1"
+    },
+    {
+      "path": "/api/v1/admin/cron/cleanup-expired-checkins",
+      "schedule": "*/15 * * * *"
+    }
+  ]
+}
