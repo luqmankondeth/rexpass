@@ -50,20 +50,25 @@ export default function CheckinStartPage({
   const [error, setError] = useState<string | null>(null)
   const [scriptReady, setScriptReady] = useState(false)
 
-  // Fetch gym info by public_code via the gyms API
+  // Fetch gym info: first resolve public_code → gymId, then get full detail
   useEffect(() => {
     async function fetchGym() {
       try {
-        // Find the gym by public_code — search in all active gyms
-        const res = await fetch(`/api/v1/gyms?city=`) // get all
-        if (!res.ok) throw new Error('Failed to load')
-        const gyms: GymInfo[] = await res.json()
-        const found = gyms.find((g) => g.public_code === publicCode)
-        if (!found) {
+        // Step 1: find gym by public_code from the list
+        const listRes = await fetch(`/api/v1/gyms`)
+        if (!listRes.ok) throw new Error('Failed to load')
+        const gyms: { id: string; public_code: string }[] = await listRes.json()
+        const match = gyms.find((g) => g.public_code === publicCode)
+        if (!match) {
           setError('Gym not found. Please check the QR code.')
-        } else {
-          setGym(found)
+          setLoading(false)
+          return
         }
+        // Step 2: fetch full detail (includes price_breakdown + is_subscriber)
+        const detailRes = await fetch(`/api/v1/gyms/${match.id}`)
+        if (!detailRes.ok) throw new Error('Failed to load gym detail')
+        const gymDetail: GymInfo = await detailRes.json()
+        setGym(gymDetail)
       } catch {
         setError('Failed to load gym details. Please try again.')
       } finally {
